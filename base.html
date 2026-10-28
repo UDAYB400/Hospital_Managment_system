@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{% block title %}Apollo Hospital Management System{% endblock %}</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Lora:ital,wght@0,600;1,400&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg:        #F0F4F0;
+      --white:     #FFFFFF;
+      --border:    #D4DED4;
+      --primary:   #1A4731;
+      --primary-m: #2D6A4F;
+      --primary-l: #E8F2EC;
+      --primary-xl:#F0F7F2;
+      --gold:      #B8860B;
+      --gold-l:    #FFF8E7;
+      --gold-m:    #D4A017;
+      --red:       #B91C1C;
+      --red-l:     #FEF2F2;
+      --teal:      #0F766E;
+      --teal-l:    #F0FDFA;
+      --text:      #0F2318;
+      --muted:     #5A7A66;
+      --radius:    12px;
+      --shadow:    0 1px 4px rgba(26,71,49,0.08);
+      --shadow-md: 0 6px 20px rgba(26,71,49,0.12);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      min-height: 100vh;
+      font-size: 14.5px;
+    }
+
+    /* ── TOP BAR ── */
+    .topbar {
+      background: var(--primary);
+      color: rgba(255,255,255,0.65);
+      font-size: 0.72rem;
+      padding: 5px 40px;
+      display: flex;
+      justify-content: space-between;
+      letter-spacing: 0.03em;
+    }
+    .topbar span { color: var(--gold-m); }
+
+    /* ── NAV ── */
+    nav {
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      padding: 0 40px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky; top: 0; z-index: 100;
+      box-shadow: var(--shadow);
+    }
+    .nav-logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+    .nav-logo-icon {
+      width: 38px; height: 38px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-m));
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem;
+      box-shadow: 0 2px 8px rgba(26,71,49,0.25);
+    }
+    .nav-logo-text { line-height: 1.15; }
+    .nav-logo-name {
+      font-size: 1.05rem; font-weight: 800;
+      color: var(--primary); letter-spacing: -0.02em;
+    }
+    .nav-logo-sub { font-size: 0.65rem; color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; }
+
+    .nav-links { display: flex; align-items: center; gap: 4px; }
+    .nav-links a {
+      padding: 7px 14px; border-radius: 8px;
+      text-decoration: none; font-size: 0.82rem; font-weight: 500;
+      color: var(--muted); border: 1px solid transparent; transition: all 0.15s;
+    }
+    .nav-links a:hover { background: var(--primary-l); color: var(--primary); }
+    .nav-links a.active { background: var(--primary-l); color: var(--primary); border-color: #b8d4c4; }
+    .nav-pill { background: var(--primary) !important; color: white !important; font-weight: 600 !important; }
+    .nav-pill:hover { background: #0f2d1e !important; }
+    .nav-badge {
+      display: inline-block; background: var(--gold); color: white;
+      font-size: 0.6rem; font-weight: 700; padding: 1px 5px;
+      border-radius: 10px; margin-left: 4px; vertical-align: middle;
+    }
+
+    /* ── MAIN ── */
+    main { max-width: 1100px; margin: 0 auto; padding: 36px 24px; }
+
+    /* ── PAGE HEADER ── */
+    .page-header { margin-bottom: 28px; }
+    .page-header h1 {
+      font-family: 'Lora', serif;
+      font-size: 1.9rem; color: var(--primary);
+      letter-spacing: -0.02em; line-height: 1.15;
+    }
+    .page-header p { color: var(--muted); margin-top: 5px; font-size: 0.85rem; }
+
+    /* ── CARDS ── */
+    .card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px 28px;
+      box-shadow: var(--shadow);
+    }
+    .card-title {
+      font-size: 0.72rem; font-weight: 700;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 18px;
+      padding-bottom: 12px; border-bottom: 1px solid var(--border);
+    }
+
+    /* ── FORM ── */
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .form-group { display: flex; flex-direction: column; gap: 5px; }
+    .form-group.full { grid-column: 1/-1; }
+    label { font-size: 0.78rem; font-weight: 600; color: var(--text); }
+    input, select, textarea {
+      background: var(--white); border: 1.5px solid var(--border);
+      border-radius: 8px; color: var(--text);
+      font-family: 'Plus Jakarta Sans', sans-serif; font-size: 0.875rem;
+      padding: 9px 12px; outline: none; width: 100%;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--primary-m);
+      box-shadow: 0 0 0 3px rgba(45,106,79,0.1);
+    }
+    textarea { resize: vertical; min-height: 80px; }
+
+    /* ── BUTTONS ── */
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 9px 20px; border-radius: 8px;
+      border: 1.5px solid transparent;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 0.84rem; font-weight: 600; cursor: pointer;
+      transition: all 0.15s; text-decoration: none;
+    }
+    .btn-primary   { background: var(--primary); color: #fff; border-color: var(--primary); }
+    .btn-primary:hover { background: #0f2d1e; }
+    .btn-gold      { background: var(--gold); color: #fff; border-color: var(--gold); }
+    .btn-gold:hover { background: #8B6508; }
+    .btn-outline   { background: transparent; color: var(--primary); border-color: var(--border); }
+    .btn-outline:hover { border-color: var(--primary-m); background: var(--primary-l); }
+    .btn-danger    { background: var(--red-l); color: var(--red); border-color: #fecaca; }
+    .btn-danger:hover { background: #fee2e2; }
+    .btn-teal      { background: var(--teal); color: #fff; }
+    .btn-teal:hover { background: #0a5c55; }
+    .btn-sm { padding: 5px 12px; font-size: 0.76rem; }
+
+    /* ── FLASH ── */
+    .flash { padding: 11px 16px; border-radius: 8px; margin-bottom: 18px; font-size: 0.84rem; font-weight: 500; display: flex; align-items: center; gap: 8px; }
+    .flash.success { background: var(--primary-l); border: 1px solid #b8d4c4; color: var(--primary); }
+    .flash.error   { background: var(--red-l);    border: 1px solid #fecaca; color: var(--red); }
+
+    /* ── TABLE ── */
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.83rem; }
+    th {
+      background: var(--primary-xl); color: var(--primary-m);
+      font-size: 0.7rem; font-weight: 700; letter-spacing: 0.07em;
+      text-transform: uppercase; padding: 10px 14px; text-align: left;
+      border-bottom: 2px solid var(--border);
+    }
+    td { padding: 11px 14px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: var(--primary-xl); }
+
+    /* ── BADGES ── */
+    .badge {
+      display: inline-block; padding: 3px 10px;
+      border-radius: 20px; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.03em;
+    }
+    .badge-normal  { background: var(--primary-l); color: var(--primary); }
+    .badge-icu     { background: var(--red-l);     color: var(--red); }
+    .badge-hicu    { background: var(--teal-l);    color: var(--teal); }
+    .badge-vent    { background: var(--gold-l);    color: var(--gold); }
+    .badge-pending { background: var(--gold-l);    color: var(--gold); }
+    .badge-treated { background: var(--primary-l); color: var(--primary); }
+    .badge-review  { background: var(--teal-l);    color: var(--teal); }
+
+    /* ── STATS ── */
+    .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 28px; }
+    .stat-card {
+      background: var(--white); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 18px 20px;
+      box-shadow: var(--shadow); position: relative; overflow: hidden;
+    }
+    .stat-card::before {
+      content: ''; position: absolute; top: 0; left: 0;
+      width: 4px; height: 100%; background: var(--primary);
+    }
+    .stat-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); margin-bottom: 6px; }
+    .stat-value { font-family: 'Lora', serif; font-size: 2.2rem; color: var(--primary); line-height: 1; }
+    .stat-icon  { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); font-size: 1.6rem; opacity: 0.12; }
+
+    /* ── SECTION TITLE ── */
+    .section-title {
+      font-size: 0.76rem; font-weight: 700; letter-spacing: 0.08em;
+      text-transform: uppercase; color: var(--muted);
+      margin: 28px 0 14px; display: flex; align-items: center; gap: 10px;
+    }
+    .section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+    /* ── EMPTY ── */
+    .empty { text-align: center; padding: 40px 20px; color: var(--muted); font-size: 0.875rem; }
+    .empty-icon { font-size: 2rem; margin-bottom: 10px; }
+
+    /* ── SPO2 ── */
+    .spo2-ok  { color: var(--primary-m); font-weight: 600; }
+    .spo2-low { color: var(--red); font-weight: 700; }
+
+    /* ── FOOTER ── */
+    footer {
+      text-align: center; padding: 24px;
+      font-size: 0.75rem; color: var(--muted);
+      border-top: 1px solid var(--border);
+      background: var(--white); margin-top: 40px;
+    }
+
+    @media (max-width: 700px) {
+      nav { padding: 0 16px; } main { padding: 20px 16px; }
+      .form-grid { grid-template-columns: 1fr; }
+      .stats { grid-template-columns: 1fr 1fr; }
+      .topbar { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <span>🏥 Apollo Hospital Management System</span>
+    <span>Emergency: <span>1800-XXX-XXXX</span> &nbsp;|&nbsp; 24/7 Support</span>
+  </div>
+  <nav>
+    <a href="/" class="nav-logo">
+      <div class="nav-logo-icon">🏥</div>
+      <div class="nav-logo-text">
+        <div class="nav-logo-name">Apollo HMS</div>
+        <div class="nav-logo-sub">Hospital Management System</div>
+      </div>
+    </a>
+    <div class="nav-links">
+      <a href="/hospitals" {% if request.path=='/hospitals' %}class="active"{% endif %}>Hospitals</a>
+      {% if session.get('patient') %}
+        <a href="/patient/dashboard" {% if '/patient/dashboard' in request.path %}class="active"{% endif %}>My Dashboard</a>
+        <a href="/patient/logout" class="btn-outline btn btn-sm">Logout — {{ session.patient_name }}</a>
+      {% elif session.get('hospital') %}
+        <a href="/hospital/dashboard" {% if '/hospital/dashboard' in request.path %}class="active"{% endif %}>Hospital Panel</a>
+        <a href="/hospital/logout" class="btn-outline btn btn-sm">Logout — {{ session.hospital }}</a>
+      {% else %}
+        <a href="/patient/login">Patient Login</a>
+        <a href="/hospital/login">Hospital Login</a>
+        <a href="/patient/register" class="nav-pill">Register as Patient</a>
+      {% endif %}
+    </div>
+  </nav>
+
+  <main>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for cat, msg in messages %}
+        <div class="flash {{ cat }}">
+          {{ '✓' if cat == 'success' else '✕' }} {{ msg }}
+        </div>
+      {% endfor %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer>
+    © 2025 Apollo Hospital Management System &nbsp;·&nbsp; All rights reserved
+  </footer>
+</body>
+</html>

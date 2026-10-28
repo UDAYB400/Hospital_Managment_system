@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+{% block title %}My Dashboard — Apollo HMS{% endblock %}
+{% block content %}
+
+<div class="page-header">
+  <h1>Welcome, {{ session.patient_name }}</h1>
+  <p>Manage your bookings and consultations from your personal dashboard</p>
+</div>
+
+<!-- ── MY BED BOOKINGS ── -->
+<div class="section-title">My Bed Bookings</div>
+{% if bookings %}
+<div class="card" style="padding:0;overflow:hidden;margin-bottom:8px;">
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>ID</th><th>Hospital</th><th>Bed Type</th><th>SPO2</th><th>Phone</th><th>Address</th><th>Action</th></tr></thead>
+      <tbody>
+        {% for b in bookings %}
+        <tr>
+          <td style="color:var(--muted);">#{{ b.id }}</td>
+          <td style="font-weight:700;color:var(--primary);">{{ b.hcode }}</td>
+          <td>
+            {% if 'Normal' in b.bedtype %}<span class="badge badge-normal">{{ b.bedtype }}</span>
+            {% elif 'HICU'  in b.bedtype %}<span class="badge badge-hicu">{{ b.bedtype }}</span>
+            {% elif 'ICU'   in b.bedtype %}<span class="badge badge-icu">{{ b.bedtype }}</span>
+            {% else %}<span class="badge badge-vent">{{ b.bedtype }}</span>{% endif %}
+          </td>
+          <td class="{{ 'spo2-low' if b.spo2 < 90 else 'spo2-ok' }}">{{ b.spo2 }}%</td>
+          <td>{{ b.pphone }}</td>
+          <td style="color:var(--muted);max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ b.paddress }}</td>
+          <td>
+            <form method="POST" action="/patient/cancel/{{ b.id }}" onsubmit="return confirm('Cancel booking?')">
+              <button type="submit" class="btn btn-danger btn-sm">Cancel</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% else %}
+<div class="card" style="margin-bottom:8px;">
+  <div class="empty"><div class="empty-icon">🛏️</div>No active bed booking.</div>
+</div>
+{% endif %}
+
+<!-- ── BOOK A BED ── -->
+<div class="section-title">Book a Bed</div>
+<div class="card" style="margin-bottom:8px;">
+  <div class="card-title">New Bed Booking</div>
+  <form method="POST" action="/patient/book">
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Select Hospital</label>
+        <select name="hcode" required>
+          <option value="" disabled selected>Choose hospital</option>
+          {% for h in hospitals %}<option value="{{ h.hcode }}">{{ h.hname }} ({{ h.hcode }})</option>{% endfor %}
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Bed Type</label>
+        <select name="bedtype" required>
+          <option value="" disabled selected>Select type</option>
+          <option value="Normal Bed">Normal Bed</option>
+          <option value="HICU Bed">HICU Bed</option>
+          <option value="ICU Bed">ICU Bed</option>
+          <option value="Ventilator Bed">Ventilator Bed</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>SPO2 Level (%)</label>
+        <input type="number" name="spo2" placeholder="e.g. 95" min="0" max="100" required/>
+      </div>
+      <div class="form-group">
+        <label>Contact Phone</label>
+        <input type="text" name="pphone" placeholder="10-digit number" maxlength="12" required/>
+      </div>
+      <div class="form-group full">
+        <label>Patient Address</label>
+        <textarea name="paddress" placeholder="Full residential address" required></textarea>
+      </div>
+    </div>
+    <div style="margin-top:18px;"><button type="submit" class="btn btn-primary">Confirm Booking</button></div>
+  </form>
+</div>
+
+<!-- ── MY CONSULTATIONS ── -->
+<div class="section-title">My Doctor Consultations</div>
+{% if consults %}
+<div class="card" style="padding:0;overflow:hidden;margin-bottom:8px;">
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>ID</th><th>Doctor</th><th>Specialization</th><th>Disease</th><th>Status</th><th>Prescription</th></tr></thead>
+      <tbody>
+        {% for c in consults %}
+        <tr>
+          <td style="color:var(--muted);">#{{ c.id }}</td>
+          <td style="font-weight:600;">Dr. {{ c.doc_name }}</td>
+          <td style="color:var(--muted);">{{ c.specialization }}</td>
+          <td style="font-weight:500;">{{ c.disease }}</td>
+          <td>
+            {% if c.status == 'pending' %}<span class="badge badge-pending">Pending</span>
+            {% elif c.status == 'treated' %}<span class="badge badge-treated">Treated</span>
+            {% else %}<span class="badge badge-review">{{ c.status }}</span>{% endif %}
+          </td>
+          <td style="color:var(--muted);font-size:0.82rem;">{{ c.prescription or '—' }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% else %}
+<div class="card" style="margin-bottom:8px;">
+  <div class="empty"><div class="empty-icon">💊</div>No consultations yet.</div>
+</div>
+{% endif %}
+
+<!-- ── REQUEST CONSULTATION ── -->
+<div class="section-title">Request a Doctor Consultation</div>
+<div class="card">
+  <div class="card-title">New Consultation Request</div>
+  {% if doctors %}
+  <form method="POST" action="/patient/consult">
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Select Doctor</label>
+        <select name="doctor_id" required>
+          <option value="" disabled selected>Choose a doctor</option>
+          {% for d in doctors %}
+          <option value="{{ d.id }}">Dr. {{ d.name }} — {{ d.specialization }} ({{ d.hcode }})</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Disease / Condition</label>
+        <input type="text" name="disease" placeholder="e.g. Fever, Chest pain, Diabetes" required/>
+      </div>
+      <div class="form-group full">
+        <label>Describe your symptoms</label>
+        <textarea name="description" placeholder="Describe your symptoms in detail..." required></textarea>
+      </div>
+    </div>
+    <div style="margin-top:18px;"><button type="submit" class="btn btn-gold">Send Consultation Request</button></div>
+  </form>
+  {% else %}
+  <div class="empty"><div class="empty-icon">👨‍⚕️</div>No doctors available at this time. Please check back later.</div>
+  {% endif %}
+</div>
+
+{% endblock %}
